@@ -5,16 +5,24 @@
     <SignAssembly>false</SignAssembly>
     <Authors>Adam Young</Authors>
     <Company>Adam Young</Company>
-    <PackageLicenseExpression>Apache 2.0</PackageLicenseExpression>
+    <PackageLicenseExpression></PackageLicenseExpression>
     <Description>Object serialization/deserialization library for the Azure Service Bus</Description>
     <PackageProjectUrl>https://github.com/AdamMYoung/ObjectBus</PackageProjectUrl>
     <RepositoryUrl>https://github.com/AdamMYoung/ObjectBus</RepositoryUrl>
+    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Azure.ServiceBus" Version="3.4.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="2.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="LICENSE.md">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
