@@ -2,6 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <SignAssembly>false</SignAssembly>
+    <Authors>Adam Young</Authors>
+    <Company>Adam Young</Company>
+    <PackageLicenseExpression>Apache 2.0</PackageLicenseExpression>
+    <Description>Object serialization/deserialization library for the Azure Service Bus</Description>
+    <PackageProjectUrl>https://github.com/AdamMYoung/ObjectBus</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/AdamMYoung/ObjectBus</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
