@@ -6,7 +6,7 @@ ObjectBus is a library to make it quick and simple to serialize/deserialize obje
 
 ## Usage
 
-First add your serial bus in the ConfigureServices() method, like so:
+First create your ObjectBus in the ConfigureServices() method, like so:
 
 ```csharp
 services.CreateObjectBus<YourMessageObject>(p =>
