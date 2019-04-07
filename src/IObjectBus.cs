@@ -15,7 +15,5 @@ namespace ObjectBus
         /// </summary>
         /// <param name="message">Object to send.</param>
         Task SendAsync(T message);
-
-
     }
 }
