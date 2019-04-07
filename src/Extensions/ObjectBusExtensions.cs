@@ -16,8 +16,6 @@ namespace ObjectBus.Extensions
         /// <returns></returns>
         public static IServiceCollection CreateObjectBus<T>(this IServiceCollection serviceCollection, Action<ObjectBusOptions> optionsAction)
         {
-            if (optionsAction == null) throw new NotImplementedException("ConnectionString and QueueName must be provided");
-
             serviceCollection.Configure(optionsAction);
             serviceCollection.AddSingleton<IObjectBus<T>, ObjectBus<T>>();
 

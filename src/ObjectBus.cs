@@ -17,6 +17,11 @@ namespace ObjectBus
         private IQueueClient Client { get; }
 
         /// <summary>
+        /// Configuration options for the message bus.
+        /// </summary>
+        private ObjectBusOptions Options { get; }
+
+        /// <summary>
         /// Event called when a message has been recieved.
         /// </summary>
         public event EventHandler<MessageEventArgs<T>> MessageRecieved;
@@ -27,14 +32,22 @@ namespace ObjectBus
         /// <param name="options">Options for connection configuration.</param>
         public ObjectBus(IOptions<ObjectBusOptions> options)
         {
-            Client = new QueueClient(options.Value.ConnectionString, options.Value.QueueName);
-            var messageHandlerOptions = new MessageHandlerOptions(ExceptionReceivedHandler)
-            {
-                MaxConcurrentCalls = 1,
-                AutoComplete = false
-            };
+            Options = options.Value;
 
-            Client.RegisterMessageHandler(ProcessMessagesAsync, messageHandlerOptions);
+            if (Options.ConnectionString == null || Options.QueueName == null)
+                throw new NullReferenceException("ConnectionString and QueueName must be provided.");
+
+            Client = new QueueClient(options.Value.ConnectionString, options.Value.QueueName);
+
+            if (Options.ClientType != BusType.Sender)
+            {
+                var messageHandlerOptions = new MessageHandlerOptions(ExceptionReceivedHandler)
+                {
+                    MaxConcurrentCalls = 1,
+                    AutoComplete = false
+                };
+                Client.RegisterMessageHandler(ProcessMessagesAsync, messageHandlerOptions);
+            }
         }
 
         /// <summary>
@@ -43,6 +56,9 @@ namespace ObjectBus
         /// <param name="message">Object to send.</param>
         public async Task SendAsync(T message)
         {
+            if (Options.ClientType == BusType.Reciever)
+                throw new InvalidOperationException("ObjectBus is set to an invalid BusType");
+
             var messageObj = JsonConvert.SerializeObject(message);
             var messageData = new Message(Encoding.UTF8.GetBytes(messageObj));
 
@@ -60,10 +76,13 @@ namespace ObjectBus
             var result = Encoding.UTF8.GetString(message.Body);
             var resultObj = JsonConvert.DeserializeObject<T>(result);
 
-            if (!token.IsCancellationRequested)
+            if (!token.IsCancellationRequested && resultObj != null)
             {
-                MessageRecieved(this, new MessageEventArgs<T> { Object = resultObj });
-                await Client.CompleteAsync(message.SystemProperties.LockToken);
+                if (MessageRecieved.GetInvocationList().Length != 0)
+                {
+                    MessageRecieved(this, new MessageEventArgs<T> { Object = resultObj });
+                    await Client.CompleteAsync(message.SystemProperties.LockToken);
+                }
             }
         }
 
