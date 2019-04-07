@@ -25,8 +25,35 @@ public MyClass(IObjectBus<YourMessageObject> objectBus)
 
 ## Send
 
-To send your objects, simply call the `SendAsync(T object)` method with the object you wish to send.
+To send your objects, simply call the `SendAsync()` method with the object you wish to send, like so:
+
+```csharp
+public void SendObject() 
+{
+	var newObject = new YourMessageObject();
+	NewObjectBus.Send(newObject);
+}
+```
 
 ## Recieve
 
-To recieve objects, subscribe to the `MessageRecieved` event of the ObjectBus. The recieved object is within the `MessageEventArgs` argument.
+To recieve objects, subscribe to the `MessageRecieved` event of the ObjectBus. 
+
+```csharp
+
+public MyClass(IObjectBus<YourMessageObject> objectBus)
+{
+	NewObjectBus = objectBus;
+	NewObjectBus.MessageRecieved += onMessageRecieved;
+}
+```
+
+The recieved object is within the `MessageEventArgs` argument.
+
+```csharp
+private void onMessageRecieved(object sender, MessageEventArgs<RecordingChunk> e)
+{
+	var myObject = e.Object;
+	//Do something with object.
+}
+```
