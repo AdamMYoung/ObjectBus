@@ -53,7 +53,6 @@ public void SendObject()
 To recieve objects, subscribe to the `MessageRecieved` event of the ObjectBus. 
 
 ```csharp
-
 public MyClass(IObjectBus<YourMessageObject> objectBus)
 {
 	NewObjectBus = objectBus;
