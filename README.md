@@ -1,6 +1,7 @@
 # ObjectBus
 
 ObjectBus is a library to make it quick and simple to serialize/deserialize objects to transmit via an Azure Serial Bus.
+
 [NuGet package](https://www.nuget.org/packages/ObjectBus/1.0.0)
 
 ## Usage
