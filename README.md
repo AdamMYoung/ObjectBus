@@ -15,7 +15,6 @@ services.CreateObjectBus<YourMessageObject>(p =>
 By default, ObjectBus instances are configured to be both senders and recievers. To adjust this, pass a `BusTypes` enum into the configure method.
 
 ```csharp
-
 services.CreateObjectBus<YourMessageObject>(p =>
 	p.Configure("ConnectionString", "QueueName", BusTypes.Sender));
 	
@@ -23,7 +22,6 @@ services.CreateObjectBus<YourMessageObject>(p =>
 
 services.CreateObjectBus<YourMessageObject>(p =>
 	p.Configure("ConnectionString", "QueueName", BusTypes.Reciever));
-
 ```
 
 
