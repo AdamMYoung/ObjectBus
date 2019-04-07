@@ -6,13 +6,13 @@ ObjectBus is a library to make it quick and simple to serialize/deserialize obje
 
 ## Usage
 
-First create your object bus in the ConfigureServices() method, like so:
+First create your ObjectBus in the ConfigureServices() method, like so:
 
 ```csharp
 services.CreateObjectBus<YourMessageObject>(p =>
 	p.Configure("ConnectionString", "QueueName"));
 ```
-Then, access the object bus via dependency injection in the constructor:
+Then, access the ObjectBus via dependency injection in the constructor:
 
 ```csharp
 private IObjectBus<YourMessageObject> NewObjectBus { get; }
