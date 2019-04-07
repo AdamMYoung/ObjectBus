@@ -31,7 +31,7 @@ To send your objects, simply call the `SendAsync()` method with the object you w
 public void SendObject() 
 {
 	var newObject = new YourMessageObject();
-	NewObjectBus.Send(newObject);
+	NewObjectBus.SendAsync(newObject);
 }
 ```
 
