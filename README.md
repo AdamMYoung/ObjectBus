@@ -12,6 +12,21 @@ First create your ObjectBus in the ConfigureServices() method, like so:
 services.CreateObjectBus<YourMessageObject>(p =>
 	p.Configure("ConnectionString", "QueueName"));
 ```
+By default, ObjectBus instances are configured to be both senders and recievers. To adjust this, pass a `BusTypes` enum into the configure method.
+
+```csharp
+
+services.CreateObjectBus<YourMessageObject>(p =>
+	p.Configure("ConnectionString", "QueueName", BusTypes.Sender));
+	
+//OR
+
+services.CreateObjectBus<YourMessageObject>(p =>
+	p.Configure("ConnectionString", "QueueName", BusTypes.Reciever));
+
+```
+
+
 Then, access the ObjectBus via dependency injection in the constructor:
 
 ```csharp
