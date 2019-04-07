@@ -6,11 +6,11 @@
     <Authors>Adam Young</Authors>
     <Company>Adam Young</Company>
     <PackageLicenseExpression></PackageLicenseExpression>
-    <Description>Object serialization/deserialization library for the Azure Service Bus</Description>
+    <Description>Object serialization/deserialization library for the Azure Service Bus.</Description>
     <PackageProjectUrl>https://github.com/AdamMYoung/ObjectBus</PackageProjectUrl>
     <RepositoryUrl>https://github.com/AdamMYoung/ObjectBus</RepositoryUrl>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
