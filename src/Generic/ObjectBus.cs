@@ -78,7 +78,7 @@ namespace ObjectBus
 
             if (!token.IsCancellationRequested && resultObj != null)
             {
-                if (MessageRecieved.GetInvocationList().Length != 0)
+                if (MessageRecieved.GetInvocationList().Length > 0)
                 {
                     MessageRecieved(this, new MessageEventArgs<T> { Object = resultObj });
                     await Client.CompleteAsync(message.SystemProperties.LockToken);
