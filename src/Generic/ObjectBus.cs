@@ -3,6 +3,8 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using ObjectBus.Options;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,6 +13,11 @@ namespace ObjectBus
 {
     public class ObjectBus<T> : IObjectBus<T>
     {
+        /// <summary>
+        /// All currently instantantiated clients.
+        /// </summary>
+        private static IDictionary<string, IQueueClient> Clients { get; set; } = new Dictionary<string, IQueueClient>();
+
         /// <summary>
         /// Client to handle message queue calls.
         /// </summary>
@@ -37,7 +44,14 @@ namespace ObjectBus
             if (Options.ConnectionString == null || Options.QueueName == null)
                 throw new NullReferenceException("ConnectionString and QueueName must be provided.");
 
-            Client = new QueueClient(options.Value.ConnectionString, options.Value.QueueName);
+            var key = Options.ConnectionString + Options.QueueName;
+            if (!Clients.TryGetValue(key, out IQueueClient value))
+            {
+                value = new QueueClient(options.Value.ConnectionString, options.Value.QueueName);
+                Clients.Add(key, value);
+            }
+
+            Client = value;
 
             if (Options.ClientType != BusType.Sender)
             {
