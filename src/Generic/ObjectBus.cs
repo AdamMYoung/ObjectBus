@@ -1,6 +1,7 @@
 ﻿using Microsoft.Azure.ServiceBus;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using ObjectBus.Options;
 using System;
 using System.Collections;
@@ -88,16 +89,24 @@ namespace ObjectBus
         private async Task ProcessMessagesAsync(Message message, CancellationToken token)
         {
             var result = Encoding.UTF8.GetString(message.Body);
-            var resultObj = JsonConvert.DeserializeObject<T>(result);
-
-            if (!token.IsCancellationRequested && resultObj != null)
+            try
             {
-                if (MessageRecieved.GetInvocationList().Length > 0)
+                var resultObj = JsonConvert.DeserializeObject<T>(result);
+
+                if (token != null && resultObj != null)
                 {
-                    MessageRecieved(this, new MessageEventArgs<T> { Object = resultObj });
-                    await Client.CompleteAsync(message.SystemProperties.LockToken);
+                    if (MessageRecieved.GetInvocationList().Length > 0)
+                    {
+                        MessageRecieved(this, new MessageEventArgs<T> { Object = resultObj });
+                        await Client.CompleteAsync(message.SystemProperties.LockToken);
+                    }
                 }
             }
+            catch (JsonSerializationException)
+            {
+                //Do nothing, as other azure busses may handle it.
+            }
+
         }
 
         /// <summary>
