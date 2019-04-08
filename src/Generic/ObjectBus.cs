@@ -89,24 +89,20 @@ namespace ObjectBus
         private async Task ProcessMessagesAsync(Message message, CancellationToken token)
         {
             var result = Encoding.UTF8.GetString(message.Body);
-            try
+            var resultObj = JsonConvert.DeserializeObject<T>(result, new JsonSerializerSettings
             {
-                var resultObj = JsonConvert.DeserializeObject<T>(result);
+                MissingMemberHandling = MissingMemberHandling.Error,
+                Error = delegate (object sender, ErrorEventArgs args) { return; }
+            });
 
-                if (token != null && resultObj != null)
+            if (token != null && resultObj != null)
+            {
+                if (MessageRecieved.GetInvocationList().Length > 0)
                 {
-                    if (MessageRecieved.GetInvocationList().Length > 0)
-                    {
-                        MessageRecieved(this, new MessageEventArgs<T> { Object = resultObj });
-                        await Client.CompleteAsync(message.SystemProperties.LockToken);
-                    }
+                    //MessageRecieved(this, new MessageEventArgs<T> { Object = resultObj });
+                    //await Client.CompleteAsync(message.SystemProperties.LockToken);
                 }
             }
-            catch (JsonSerializationException)
-            {
-                //Do nothing, as other azure busses may handle it.
-            }
-
         }
 
         /// <summary>
