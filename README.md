@@ -12,12 +12,13 @@ First create your ObjectBus in the ConfigureServices() method, like so:
 services.CreateObjectBus<YourMessageObject>(p =>
 	p.Configure("ConnectionString", "QueueName"));
 ```
+ObjectBus can handle multiple object types on one bus, utilizing a single client if the connection string and queue name are the same. To add multiple objects, simply call the `services.CreateObjectBus()` with the desired objects.
+
 By default, ObjectBus instances are configured to be both senders and recievers. To adjust this, pass a `BusTypes` enum into the configure method.
 
 ```csharp
 services.CreateObjectBus<YourMessageObject>(p =>
-	p.Configure("ConnectionString", "QueueName", BusTypes.Sender));
-	
+	p.Configure("ConnectionString", "QueueName", BusTypes.Sender));	
 //OR
 
 services.CreateObjectBus<YourMessageObject>(p =>
