@@ -15,6 +15,11 @@ namespace ObjectBus
     public class ObjectBus<T> : IObjectBus<T>
     {
         /// <summary>
+        /// Set of JSON strings that failed parsing.
+        /// </summary>
+        private HashSet<string> ParseErrors { get; } = new HashSet<string>();
+
+        /// <summary>
         /// Client to handle message queue calls.
         /// </summary>
         private IQueueClient Client { get; }
@@ -87,21 +92,29 @@ namespace ObjectBus
         {
             var result = Encoding.UTF8.GetString(message.Body);
 
-            bool failedDeserialization = false;
-            var resultObj = JsonConvert.DeserializeObject<T>(result, new JsonSerializerSettings
+            //JSON has not been attempted for the current client.
+            if (!ParseErrors.Contains(result))
             {
-                MissingMemberHandling = MissingMemberHandling.Error,
-                Error = delegate (object sender, ErrorEventArgs args) 
+                bool failedDeserialization = false;
+                var resultObj = JsonConvert.DeserializeObject<T>(result, new JsonSerializerSettings
                 {
-                    args.ErrorContext.Handled = true;
-                    failedDeserialization = true;
-                }
-            });
+                    MissingMemberHandling = MissingMemberHandling.Error,
+                    Error = delegate (object sender, ErrorEventArgs args)
+                    {
+                        args.ErrorContext.Handled = true;
+                        failedDeserialization = true;
+                    }
+                });
 
-            if (token != null && resultObj != null && !failedDeserialization)
-            {
-                await HandleMessageAsync(resultObj);
-                await Client.CompleteAsync(message.SystemProperties.LockToken);
+                if (token != null && resultObj != null && !failedDeserialization)
+                {
+                    await HandleMessageAsync(resultObj);
+                    await Client.CompleteAsync(message.SystemProperties.LockToken);
+                }
+                else
+                {
+                    ParseErrors.Add(result);
+                }
             }
         }
 
@@ -119,15 +132,6 @@ namespace ObjectBus
             Console.WriteLine($"- Entity Path: {context.EntityPath}");
             Console.WriteLine($"- Executing Action: {context.Action}");
             return Task.CompletedTask;
-        }
-
-        private static bool IsNullable<T>(T obj)
-        {
-            if (obj == null) return true; // obvious
-            Type type = typeof(T);
-            if (!type.IsValueType) return true; // ref-type
-            if (Nullable.GetUnderlyingType(type) != null) return true; // Nullable<T>
-            return false; // value-type
         }
     }
 }
