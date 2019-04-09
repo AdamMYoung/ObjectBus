@@ -73,7 +73,7 @@ private void onMessageRecieved(object sender, MessageEventArgs<RecordingChunk> e
 
 ## Overrides
 
-If the current implementation doesn't fit your use case, you can create a subclass of ObjectBus, and override the `SendAsync()` or `HandleMessage()` methods like so:
+If the current implementation doesn't fit your use case, you can create a subclass of ObjectBus, and override the `SendAsync()` or `HandleMessageAsync()` methods like so:
 
 ```csharp
 public class SubclassObjectBus : ObjectBus<YourMessageObject> 
@@ -81,7 +81,7 @@ public class SubclassObjectBus : ObjectBus<YourMessageObject>
 	public SubclassObjectBus(IOptions<YourMessageObject> options) : base(options) {}
 	
 	//Handle incoming messages.
-	override void HandleMessage(YourMessageObject message) {}
+	override Task HandleMessageAsync(YourMessageObject message) {}
 	
 	//Handle outgoing messages.
 	override Task SendAsync(YourMessageObject message){}
