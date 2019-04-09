@@ -69,7 +69,7 @@ namespace ObjectBus
         /// Sends the provided object to registered recipients.
         /// </summary>
         /// <param name="message">Object to send.</param>
-        public async Task SendAsync(T message)
+        public virtual async Task SendAsync(T message)
         {
             if (Options.ClientType == BusType.Reciever)
                 throw new InvalidOperationException("ObjectBus is set to an invalid BusType");
@@ -78,6 +78,16 @@ namespace ObjectBus
             var messageData = new Message(Encoding.UTF8.GetBytes(messageObj));
 
             await Client.SendAsync(messageData);
+        }
+
+        /// <summary>
+        /// Handles the returned object.
+        /// </summary>
+        /// <param name="message">Object returned.</param>
+        public virtual void HandleMessage(T message)
+        {
+            if (MessageRecieved.GetInvocationList().Length > 0)
+                MessageRecieved(this, new MessageEventArgs<T> { Object = message });
         }
 
         /// <summary>
@@ -97,11 +107,8 @@ namespace ObjectBus
 
             if (token != null && resultObj != null)
             {
-                if (MessageRecieved.GetInvocationList().Length > 0)
-                {
-                    //MessageRecieved(this, new MessageEventArgs<T> { Object = resultObj });
-                    //await Client.CompleteAsync(message.SystemProperties.LockToken);
-                }
+                HandleMessage(resultObj);
+                await Client.CompleteAsync(message.SystemProperties.LockToken);
             }
         }
 
