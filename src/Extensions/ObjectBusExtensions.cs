@@ -8,9 +8,9 @@ namespace ObjectBus.Extensions
     {
         /// <summary>
         /// Creates an Azure Service Bus using the object provided as the transport mechanism. 
-        /// The service bus is injected via the IServiceBus<T>.
+        /// The ObjectBus is injected via the IObjectBus<TObjectType>.
         /// </summary>
-        /// <typeparam name="T">Object to send/recieve.</typeparam>
+        /// <typeparam name="TObjectType">Object to send/recieve.</typeparam>
         /// <param name="serviceCollection">Collection of services to inject into.</param>
         /// <param name="optionsAction">Configuration options of the application.</param>
         /// <returns></returns>
@@ -21,9 +21,11 @@ namespace ObjectBus.Extensions
 
         /// <summary>
         /// Creates an Azure Service Bus using the object provided as the transport mechanism. 
-        /// The service bus is injected via the IServiceBus<T>.
+        /// The service bus is injected via the IObjectBus<T>, using the provided ObjectBus implementation
+        /// defined as TObjectBus.
         /// </summary>
-        /// <typeparam name="T">Object to send/recieve.</typeparam>
+        /// <typeparam name="TObjectType">Object to send/recieve.</typeparam>
+        /// <typeparam name="TObjectBus">ObjectBus implementation to inject.</typeparam>
         /// <param name="serviceCollection">Collection of services to inject into.</param>
         /// <param name="optionsAction">Configuration options of the application.</param>
         /// <returns></returns>
