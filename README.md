@@ -70,3 +70,26 @@ private void onMessageRecieved(object sender, MessageEventArgs<RecordingChunk> e
 	//Do something with object.
 }
 ```
+
+## Overrides
+
+If the current implementation doesn't fit your use case, you can create a subclass of ObjectBus, and override the `SendAsync()` or `HandleMessage()` methods like so:
+
+```csharp
+public class SubclassObjectBus : ObjectBus<YourMessageObject> 
+{
+	public SubclassObjectBus(IOptions<YourMessageObject> options) : base(options) {}
+	
+	//Handle incoming messages.
+	override void HandleMessage(YourMessageObject message) {}
+	
+	//Handle outgoing messages.
+	override Task SendAsync(YourMessageObject message){}
+}
+```
+
+This can then be injected in the startup method similar to before, with the subclass specified.
+```csharp
+services.CreateObjectBus<YourMessageObject, SubclassObjectBus>(p =>
+	p.Configure("ConnectionString", "QueueName", BusTypes.Sender));	
+```
