@@ -15,11 +15,6 @@ namespace ObjectBus
     public class ObjectBus<T> : IObjectBus<T>
     {
         /// <summary>
-        /// All currently instantantiated clients.
-        /// </summary>
-        private static IDictionary<string, IQueueClient> Clients { get; set; } = new Dictionary<string, IQueueClient>();
-
-        /// <summary>
         /// Client to handle message queue calls.
         /// </summary>
         private IQueueClient Client { get; }
@@ -45,15 +40,7 @@ namespace ObjectBus
             if (Options.ConnectionString == null || Options.QueueName == null)
                 throw new NullReferenceException("ConnectionString and QueueName must be provided.");
 
-            var key = Options.ConnectionString + Options.QueueName;
-            if (!Clients.TryGetValue(key, out IQueueClient value))
-            {
-                value = new QueueClient(options.Value.ConnectionString, options.Value.QueueName);
-                Clients.Add(key, value);
-            }
-
-            Client = value;
-
+            Client = new QueueClient(Options.ConnectionString, Options.QueueName);
             if (Options.ClientType != BusType.Sender)
             {
                 var messageHandlerOptions = new MessageHandlerOptions(ExceptionReceivedHandler)
@@ -99,10 +86,15 @@ namespace ObjectBus
         private async Task ProcessMessagesAsync(Message message, CancellationToken token)
         {
             var result = Encoding.UTF8.GetString(message.Body);
-            var resultObj = JsonConvert.DeserializeObject<T>(result, new JsonSerializerSettings
+            T resultObj;
+            resultObj = JsonConvert.DeserializeObject<T>(result, new JsonSerializerSettings
             {
                 MissingMemberHandling = MissingMemberHandling.Error,
-                Error = delegate (object sender, ErrorEventArgs args) { return; }
+                Error = delegate (object sender, ErrorEventArgs args) 
+                {
+                    args.ErrorContext.Handled = true;
+                    resultObj = default;
+                }
             });
 
             if (token != null && resultObj != null)
@@ -126,6 +118,15 @@ namespace ObjectBus
             Console.WriteLine($"- Entity Path: {context.EntityPath}");
             Console.WriteLine($"- Executing Action: {context.Action}");
             return Task.CompletedTask;
+        }
+
+        private static bool IsNullable<T>(T obj)
+        {
+            if (obj == null) return true; // obvious
+            Type type = typeof(T);
+            if (!type.IsValueType) return true; // ref-type
+            if (Nullable.GetUnderlyingType(type) != null) return true; // Nullable<T>
+            return false; // value-type
         }
     }
 }

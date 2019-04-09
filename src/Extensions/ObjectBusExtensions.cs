@@ -33,7 +33,7 @@ namespace ObjectBus.Extensions
             where TObjectBus : ObjectBus<TObjectType>
         {
             serviceCollection.Configure(optionsAction);
-            serviceCollection.AddSingleton<IObjectBus<TObjectType>, TObjectBus>();
+            serviceCollection.AddScoped<IObjectBus<TObjectType>, TObjectBus>();
 
             return serviceCollection;
         }
