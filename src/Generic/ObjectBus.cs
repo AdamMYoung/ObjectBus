@@ -84,10 +84,10 @@ namespace ObjectBus
         /// Handles the returned object.
         /// </summary>
         /// <param name="message">Object returned.</param>
-        public virtual void HandleMessage(T message)
+        public async virtual Task HandleMessageAsync(T message)
         {
             if (MessageRecieved.GetInvocationList().Length > 0)
-                MessageRecieved(this, new MessageEventArgs<T> { Object = message });
+                await Task.Run(() => MessageRecieved(this, new MessageEventArgs<T> { Object = message }));
         }
 
         /// <summary>
@@ -107,7 +107,7 @@ namespace ObjectBus
 
             if (token != null && resultObj != null)
             {
-                HandleMessage(resultObj);
+                await HandleMessageAsync(resultObj);
                 await Client.CompleteAsync(message.SystemProperties.LockToken);
             }
         }
