@@ -86,18 +86,19 @@ namespace ObjectBus
         private async Task ProcessMessagesAsync(Message message, CancellationToken token)
         {
             var result = Encoding.UTF8.GetString(message.Body);
-            T resultObj;
-            resultObj = JsonConvert.DeserializeObject<T>(result, new JsonSerializerSettings
+
+            bool failedDeserialization = false;
+            var resultObj = JsonConvert.DeserializeObject<T>(result, new JsonSerializerSettings
             {
                 MissingMemberHandling = MissingMemberHandling.Error,
                 Error = delegate (object sender, ErrorEventArgs args) 
                 {
                     args.ErrorContext.Handled = true;
-                    resultObj = default;
+                    failedDeserialization = true;
                 }
             });
 
-            if (token != null && resultObj != null)
+            if (token != null && resultObj != null && !failedDeserialization)
             {
                 await HandleMessageAsync(resultObj);
                 await Client.CompleteAsync(message.SystemProperties.LockToken);
