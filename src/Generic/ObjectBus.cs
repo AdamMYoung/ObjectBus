@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace ObjectBus
 {
-    public class ObjectBus<T> : IObjectBus<T>
+    public class ObjectBus<TObjectType> : IObjectBus<TObjectType>
     {
         /// <summary>
         /// Set of JSON strings that failed parsing.
@@ -27,18 +27,18 @@ namespace ObjectBus
         /// <summary>
         /// Configuration options for the message bus.
         /// </summary>
-        private ObjectBusOptions Options { get; }
+        private ObjectBusOptions<TObjectType> Options { get; }
 
         /// <summary>
         /// Event called when a message has been recieved.
         /// </summary>
-        public event EventHandler<MessageEventArgs<T>> MessageRecieved;
+        public event EventHandler<MessageEventArgs<TObjectType>> MessageRecieved;
 
         /// <summary>
         /// Instantaites a new MessageBus from the provided options.
         /// </summary>
         /// <param name="options">Options for connection configuration.</param>
-        public ObjectBus(IOptions<ObjectBusOptions> options)
+        public ObjectBus(IOptions<ObjectBusOptions<TObjectType>> options)
         {
             Options = options.Value;
 
@@ -61,7 +61,7 @@ namespace ObjectBus
         /// Sends the provided object to registered recipients.
         /// </summary>
         /// <param name="message">Object to send.</param>
-        public virtual async Task SendAsync(T message)
+        public virtual async Task SendAsync(TObjectType message)
         {
             if (Options.ClientType == BusType.Reciever)
                 throw new InvalidOperationException("ObjectBus is set to an invalid BusType");
@@ -76,10 +76,10 @@ namespace ObjectBus
         /// Handles the returned object.
         /// </summary>
         /// <param name="message">Object returned.</param>
-        public async virtual Task HandleMessageAsync(T message)
+        public async virtual Task HandleMessageAsync(TObjectType message)
         {
             if (MessageRecieved.GetInvocationList().Length > 0)
-                await Task.Run(() => MessageRecieved(this, new MessageEventArgs<T> { Object = message }));
+                await Task.Run(() => MessageRecieved(this, new MessageEventArgs<TObjectType> { Object = message }));
         }
 
         /// <summary>
@@ -96,7 +96,7 @@ namespace ObjectBus
             if (!ParseErrors.Contains(result))
             {
                 bool failedDeserialization = false;
-                var resultObj = JsonConvert.DeserializeObject<T>(result, new JsonSerializerSettings
+                var resultObj = JsonConvert.DeserializeObject<TObjectType>(result, new JsonSerializerSettings
                 {
                     MissingMemberHandling = MissingMemberHandling.Error,
                     Error = delegate (object sender, ErrorEventArgs args)

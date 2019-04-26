@@ -14,7 +14,7 @@ namespace ObjectBus.Extensions
         /// <param name="serviceCollection">Collection of services to inject into.</param>
         /// <param name="optionsAction">Configuration options of the application.</param>
         /// <returns></returns>
-        public static IServiceCollection CreateObjectBus<TObjectType>(this IServiceCollection serviceCollection, Action<ObjectBusOptions> optionsAction)
+        public static IServiceCollection CreateObjectBus<TObjectType>(this IServiceCollection serviceCollection, Action<ObjectBusOptions<TObjectType>> optionsAction)
         {
             return CreateObjectBus<TObjectType, ObjectBus<TObjectType>>(serviceCollection, optionsAction);
         }
@@ -29,7 +29,7 @@ namespace ObjectBus.Extensions
         /// <param name="serviceCollection">Collection of services to inject into.</param>
         /// <param name="optionsAction">Configuration options of the application.</param>
         /// <returns></returns>
-        public static IServiceCollection CreateObjectBus<TObjectType, TObjectBus>(this IServiceCollection serviceCollection, Action<ObjectBusOptions> optionsAction)
+        public static IServiceCollection CreateObjectBus<TObjectType, TObjectBus>(this IServiceCollection serviceCollection, Action<ObjectBusOptions<TObjectType>> optionsAction)
             where TObjectBus : ObjectBus<TObjectType>
         {
             serviceCollection.Configure(optionsAction);
