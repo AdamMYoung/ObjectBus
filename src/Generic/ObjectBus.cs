@@ -14,10 +14,6 @@ namespace ObjectBus
 {
     public class ObjectBus<TObjectType> : IObjectBus<TObjectType>
     {
-        /// <summary>
-        /// Set of JSON strings that failed parsing.
-        /// </summary>
-        private HashSet<string> ParseErrors { get; } = new HashSet<string>();
 
         /// <summary>
         /// Client to handle message queue calls.
@@ -30,12 +26,12 @@ namespace ObjectBus
         private ObjectBusOptions<TObjectType> Options { get; }
 
         /// <summary>
-        /// Event called when a message has been recieved.
+        /// Event called when a message has been received.
         /// </summary>
         public event EventHandler<MessageEventArgs<TObjectType>> MessageRecieved;
 
         /// <summary>
-        /// Instantaites a new MessageBus from the provided options.
+        /// Instantiates a new MessageBus from the provided options.
         /// </summary>
         /// <param name="options">Options for connection configuration.</param>
         public ObjectBus(IOptions<ObjectBusOptions<TObjectType>> options)
@@ -46,7 +42,7 @@ namespace ObjectBus
                 throw new NullReferenceException("ConnectionString and QueueName must be provided.");
 
             Client = new QueueClient(Options.ConnectionString, Options.QueueName);
-            if (Options.ClientType != BusType.Sender)
+            if (Options.ClientType == BusType.Reciever)
             {
                 var messageHandlerOptions = new MessageHandlerOptions(ExceptionReceivedHandler)
                 {
@@ -90,32 +86,16 @@ namespace ObjectBus
         /// <returns></returns>
         private async Task ProcessMessagesAsync(Message message, CancellationToken token)
         {
+            token.ThrowIfCancellationRequested();
+
             var result = Encoding.UTF8.GetString(message.Body);
-
-            //JSON has not been attempted for the current client.
-            if (!ParseErrors.Contains(result))
+            var resultObj = JsonConvert.DeserializeObject<TObjectType>(result, new JsonSerializerSettings
             {
-                bool failedDeserialization = false;
-                var resultObj = JsonConvert.DeserializeObject<TObjectType>(result, new JsonSerializerSettings
-                {
-                    MissingMemberHandling = MissingMemberHandling.Error,
-                    Error = delegate (object sender, ErrorEventArgs args)
-                    {
-                        args.ErrorContext.Handled = true;
-                        failedDeserialization = true;
-                    }
-                });
+                MissingMemberHandling = MissingMemberHandling.Error,
+            });
 
-                if (token != null && resultObj != null && !failedDeserialization)
-                {
-                    await HandleMessageAsync(resultObj);
-                    await Client.CompleteAsync(message.SystemProperties.LockToken);
-                }
-                else
-                {
-                    ParseErrors.Add(result);
-                }
-            }
+            await HandleMessageAsync(resultObj);
+            await Client.CompleteAsync(message.SystemProperties.LockToken);
         }
 
         /// <summary>

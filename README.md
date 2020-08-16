@@ -1,19 +1,12 @@
 # ObjectBus
 
-ObjectBus is a library to make it quick and simple to serialize/deserialize objects to transmit via an Azure Serial Bus.
+ObjectBus is a library to make it quick and simple to serialize/serialize objects across applications via an Azure Service Bus.
 
 [NuGet package](https://www.nuget.org/packages/ObjectBus)
 
 ## Usage
 
-First create your ObjectBus in the ConfigureServices() method, like so:
-
-```csharp
-services.CreateObjectBus<YourMessageObject>(p =>
-	p.Configure("ConnectionString", "QueueName"));
-```
-
-By default, ObjectBus instances are configured to be both senders and recievers. To adjust this, pass a `BusTypes` enum into the configure method.
+First create your ObjectBus in the ConfigureServices() method, by specifying the connection information and bus type.
 
 ```csharp
 services.CreateObjectBus<YourMessageObject>(p =>
@@ -51,7 +44,7 @@ public void SendObject()
 
 ## Recieve
 
-To recieve objects, subscribe to the `MessageRecieved` event of the ObjectBus. 
+To receive objects, subscribe to the `MessageRecieved` event of the ObjectBus. 
 
 ```csharp
 public MyClass(IObjectBus<YourMessageObject> objectBus)
@@ -61,7 +54,7 @@ public MyClass(IObjectBus<YourMessageObject> objectBus)
 }
 ```
 
-The recieved object is within the `MessageEventArgs` argument.
+The received object is within the `MessageEventArgs` argument.
 
 ```csharp
 private void onMessageRecieved(object sender, MessageEventArgs<RecordingChunk> e)

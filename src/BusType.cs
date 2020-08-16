@@ -12,13 +12,8 @@ namespace ObjectBus
         Sender,
 
         /// <summary>
-        /// ObjectBus will be a reciever of data.
+        /// ObjectBus will be a receiver of data.
         /// </summary>
-        Reciever,
-
-        /// <summary>
-        /// ObjectBus both recieves and sends data.
-        /// </summary>
-        SendRecieve
+        Reciever
     }
 }

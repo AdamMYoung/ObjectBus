@@ -6,7 +6,7 @@ namespace ObjectBus
     public interface IObjectBus<TObjectType>
     {
         /// <summary>
-        /// Event called when a new message has been recieved.
+        /// Event called when a new message has been received.
         /// </summary>
         event EventHandler<MessageEventArgs<TObjectType>> MessageRecieved;
 
