@@ -24,8 +24,9 @@ namespace ObjectBus.Options
         /// </summary>
         /// <param name="connectionString">Connection string of the Azure service bus.</param>
         /// <param name="queueName">Name of the queue to connect to.</param>
+        /// <param name="clientType">Type of client the bus represents.</param>
         /// <returns></returns>
-        public ObjectBusOptions<T> Configure(string connectionString, string queueName, BusType clientType = BusType.SendRecieve)
+        public ObjectBusOptions<T> Configure(string connectionString, string queueName, BusType clientType)
         {
             ConnectionString = connectionString;
             QueueName = queueName;
